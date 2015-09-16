@@ -1,26 +1,21 @@
 var http = require("http");
+var url = require("url");
 
-http.createServer(function(request, response){
-  console.log("Request received" + Date.now());
-  response.writeHead(200, {"Content-Type": "text/plain"});
-  response.write("Hello World");
-  response.end();
-}).listen(8888);
-// if you run
-// node server.js and then go to:
-// http://localhost:8888/
-// you will see your web server up and running
+function start(route, handle){
 
-console.log("Server has started");
+  function onRequest(request, response){
+    var pathname = url.parse(request.url).pathname;
+    console.log("Request for " + pathname +" received");
 
-// We could refactor to:
-//
-// var http = require("http");
-//
-// function onRequest(request, response) {
-//   response.writeHead(200, {"Content-Type": "text/plain"});
-//   response.write("Hello World");
-//   response.end();
-// }
-//
-// http.createServer(onRequest).listen(8888);
+    route(handle, pathname);
+
+    response.writeHead(200, {"Content-Type": "text/plain"});
+    response.write("Hello World");
+    response.end();
+  }
+
+  http.createServer(onRequest).listen(8888);
+  console.log("Server has started");
+}
+
+exports.start = start;
